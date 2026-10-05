@@ -1,7 +1,8 @@
 <?php 
 /** @var String $num_columns
  *  @var String $num_rows
- *  @var String $board_markup 
+ *  @var String $board_markup
+ *  @var String $imagen
  */
 ?>
 <!DOCTYPE html>
@@ -58,16 +59,29 @@
             background-position-y: -52px;
         }
 
+        .board-overlay{
+            width: 10px;
+            height: 10px;
+        }
+
+        .link-tile{
+            background-image: url('./public/img/link.png');
+            background-position: center;
+            background-size: 100%;
+            z-index: 1;
+        }
+
     </style>
 </head>
 <body>
-    <main>
-        <h1>Zelda 40th Anniversary</h1>
-        <?php echo $board_markup; ?> 
-        <div class="controls-container">
+<main>
+    <h1>Zelda 40th Anniversary</h1>
+    <?php echo $board_markup; ?>
+    <div class="controls-container">
+        
+    </div>
 
-        </div>
-    </main>
+</main>
     
 </body>
 </html>
