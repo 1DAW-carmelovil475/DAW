@@ -21,7 +21,7 @@ function dump($var){
 </head>
 <body>
     <h2>Realizar una reserva</h2>
-    <form method="post">
+    <form method="post" action="index.php">
         <label for="nombre">Introduce el nombre: </label>
         <input type="text" name="nombre" id="nombre" minlength=2 maxlength=60 required>
         <label for="email">Introduce el email: </label>

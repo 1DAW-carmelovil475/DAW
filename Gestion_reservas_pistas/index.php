@@ -4,10 +4,17 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+include(__DIR__.'/src/functions.php');
+
 function dump($var){
     echo '<pre>'.print_r($var, 1).'</pre>';
 }
 
+dump($_POST);
+
+insertarCSV($_POST);
+
+//Para saber como voy: tengo que realizarle un foreach a los array de los checkbox xq sino me sale array literalmente, tambien necesito leerCSV para realizar las tablas y tengo que filtrar por fecha y eso, tengo que mirarlo en el pdf de "Formularios en PHP" en la página 22, el ejercicio 11.
 
 ?>
 
@@ -19,15 +26,6 @@ function dump($var){
     <title>Document</title>
 </head>
 <body>
-    <form method="get">
-        <fieldset>
-            <legend>Materiales</legend>
-            <label for="mat_silicona">Silicona</label>
-            <input type="checkbox" name="materiales[]" id="mat_silicona" value="silicona">
-            <label for="mat_pvc">PVC</label>
-            <input type="checkbox" name="materiales[]" id="mat_pvc" value="pvc">
-        </fieldset>
-        <button>Enviar materiales</button>
-    </form>
+
 </body>
 </html>
