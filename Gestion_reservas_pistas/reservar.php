@@ -1,7 +1,6 @@
 <?php
 include(__DIR__ . '/src/functions.php');
 
-// Lo que se ve en el formulario la primera vez
 $reserva = [
     'nombre' => '',
     'email' => '',
@@ -13,7 +12,6 @@ $reserva = [
 ];
 $errores = [];
 
-// Si han enviado el formulario
 if (($_SERVER['REQUEST_METHOD'] ?? '') == 'POST') {
     $reserva['nombre'] = campoTexto($_POST, 'nombre');
     $reserva['email'] = campoTexto($_POST, 'email');
@@ -25,7 +23,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') == 'POST') {
 
     $errores = validarReserva($reserva);
 
-    // Sin errores: guardamos y vamos a la confirmación
     if (count($errores) == 0) {
         $numero = guardarReserva($reserva);
         header('Location: confirmacion.php?n=' . $numero, true, 303);

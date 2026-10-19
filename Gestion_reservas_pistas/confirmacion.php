@@ -1,7 +1,6 @@
 <?php
 include(__DIR__ . '/src/functions.php');
 
-// Número de reserva que viene por la URL
 $numero = campoTexto($_GET, 'n');
 $reserva = null;
 
@@ -11,7 +10,6 @@ foreach (leerReservas() as $fila) {
     }
 }
 
-// Si no existe, error 404
 if ($reserva == null) {
     http_response_code(404);
 }

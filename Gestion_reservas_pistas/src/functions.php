@@ -55,7 +55,6 @@ function validarReserva($reserva) {
     global $pistas, $horas, $materiales;
     $errores = [];
 
-    // Nombre: entre 2 y 60 letras (con tildes y ñ) o espacios
     if (!preg_match('/^[\p{L} ]{2,60}$/u', $reserva['nombre'])) {
         $errores['nombre'] = 'El nombre debe tener entre 2 y 60 letras.';
     }

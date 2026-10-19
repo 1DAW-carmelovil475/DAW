@@ -1,11 +1,9 @@
 <?php
 include(__DIR__ . '/src/functions.php');
 
-// Lo que el usuario ha elegido en el filtro (viene por la URL)
 $pistaElegida = campoTexto($_GET, 'pista');
 $fechaElegida = campoTexto($_GET, 'fecha');
 
-// Nos quedamos solo con las reservas que encajan con el filtro
 $lista = [];
 foreach (leerReservas() as $fila) {
     if ($pistaElegida != '' && $fila[3] != $pistaElegida) {
