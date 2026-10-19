@@ -1,31 +1,66 @@
 <?php
+include(__DIR__ . '/src/functions.php');
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Lo que el usuario ha elegido en el filtro (viene por la URL)
+$pistaElegida = campoTexto($_GET, 'pista');
+$fechaElegida = campoTexto($_GET, 'fecha');
 
-include(__DIR__.'/src/functions.php');
-
-function dump($var){
-    echo '<pre>'.print_r($var, 1).'</pre>';
+// Nos quedamos solo con las reservas que encajan con el filtro
+$lista = [];
+foreach (leerReservas() as $fila) {
+    if ($pistaElegida != '' && $fila[3] != $pistaElegida) {
+        continue;
+    }
+    if ($fechaElegida != '' && $fila[4] != $fechaElegida) {
+        continue;
+    }
+    $lista[] = $fila;
 }
-
-dump($_POST);
-
-insertarCSV($_POST);
-
-//Para saber como voy: tengo que realizarle un foreach a los array de los checkbox xq sino me sale array literalmente, tambien necesito leerCSV para realizar las tablas y tengo que filtrar por fecha y eso, tengo que mirarlo en el pdf de "Formularios en PHP" en la página 22, el ejercicio 11.
-
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Reservas</title>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
 </head>
 <body>
+    <h1>Reservas del polideportivo</h1>
+    <p><a href="reservar.php">Hacer una reserva</a></p>
 
+    <form method="get" action="index.php">
+        <label for="pista">Pista</label>
+        <select name="pista" id="pista">
+            <option value="">Todas</option>
+            <?php foreach ($pistas as $clave => $texto) { ?>
+                <option value="<?= e($clave) ?>" <?php if ($pistaElegida == $clave) { echo 'selected'; } ?>><?= e($texto) ?></option>
+            <?php } ?>
+        </select>
+
+        <label for="fecha">Fecha</label>
+        <input type="date" name="fecha" id="fecha" value="<?= e($fechaElegida) ?>">
+
+        <button type="submit">Filtrar</button>
+    </form>
+
+    <?php if (count($lista) == 0) { ?>
+        <p>No hay reservas</p>
+    <?php } else { ?>
+        <table>
+            <tr>
+                <th>Nº</th><th>Nombre</th><th>Pista</th><th>Fecha</th><th>Hora</th><th>Material</th>
+            </tr>
+            <?php foreach ($lista as $fila) { ?>
+                <tr>
+                    <td><a href="confirmacion.php?n=<?= e($fila[0]) ?>"><?= e($fila[0]) ?></a></td>
+                    <td><?= e($fila[1]) ?></td>
+                    <td><?= e($fila[3]) ?></td>
+                    <td><?= e($fila[4]) ?></td>
+                    <td><?= e($fila[5]) ?></td>
+                    <td><?= e($fila[6]) ?></td>
+                </tr>
+            <?php } ?>
+        </table>
+    <?php } ?>
 </body>
 </html>

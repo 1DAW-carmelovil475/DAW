@@ -1,68 +1,102 @@
 <?php
+include(__DIR__ . '/src/functions.php');
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Lo que se ve en el formulario la primera vez
+$reserva = [
+    'nombre' => '',
+    'email' => '',
+    'pista' => '',
+    'fecha' => date('Y-m-d'),
+    'hora' => '',
+    'material' => [],
+    'normas' => '',
+];
+$errores = [];
 
-function dump($var){
-    echo '<pre>'.print_r($var, 1).'</pre>';
+// Si han enviado el formulario
+if (($_SERVER['REQUEST_METHOD'] ?? '') == 'POST') {
+    $reserva['nombre'] = campoTexto($_POST, 'nombre');
+    $reserva['email'] = campoTexto($_POST, 'email');
+    $reserva['pista'] = campoTexto($_POST, 'pista');
+    $reserva['fecha'] = campoTexto($_POST, 'fecha');
+    $reserva['hora'] = campoTexto($_POST, 'hora');
+    $reserva['material'] = campoLista($_POST, 'material');
+    $reserva['normas'] = campoTexto($_POST, 'normas');
+
+    $errores = validarReserva($reserva);
+
+    // Sin errores: guardamos y vamos a la confirmación
+    if (count($errores) == 0) {
+        $numero = guardarReserva($reserva);
+        header('Location: confirmacion.php?n=' . $numero, true, 303);
+        exit;
+    }
+
+    http_response_code(422);
 }
-
-
 ?>
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Reservar</title>
     <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
 </head>
 <body>
-    <h2>Realizar una reserva</h2>
-    <form method="post" action="index.php">
-        <label for="nombre">Introduce el nombre: </label>
-        <input type="text" name="nombre" id="nombre" minlength=2 maxlength=60 required>
-        <label for="email">Introduce el email: </label>
-        <input type="email" name="email" id="email">
-        <label for="select">Reserva a escoger: </label>
-        <select name="select" id="select">
-            <option value="padel1">Pádel 1</option>
-            <option value="padel2">Pádel 2</option>
-            <option value="tenis">Tenis</option>
-            <option value="baloncesto">Baloncesto</option>
+    <h1>Realizar una reserva</h1>
+    <p><a href="index.php">Ver reservas</a></p>
+
+    <form method="post" action="reservar.php" novalidate>
+        <label for="nombre">Nombre</label>
+        <input type="text" name="nombre" id="nombre" value="<?= e($reserva['nombre']) ?>">
+        <?php if (isset($errores['nombre'])) { echo '<p><strong>' . e($errores['nombre']) . '</strong></p>'; } ?>
+
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" value="<?= e($reserva['email']) ?>">
+        <?php if (isset($errores['email'])) { echo '<p><strong>' . e($errores['email']) . '</strong></p>'; } ?>
+
+        <label for="pista">Pista</label>
+        <select name="pista" id="pista">
+            <option value="">-- Elige una pista --</option>
+            <?php foreach ($pistas as $clave => $texto) { ?>
+                <option value="<?= e($clave) ?>" <?php if ($reserva['pista'] == $clave) { echo 'selected'; } ?>><?= e($texto) ?></option>
+            <?php } ?>
         </select>
-        <label for="fecha">Fecha de reserva:</label>
-        <input
-        type="date"
-        id="fecha"
-        name="fecha"
-        value="2026-10-16"
-        min="2026-10-16"
-        max="2026-12-31" />
-        <label for="hora">Hora de la reserva:</label>
-        <input
-        type="time"
-        id="hora"
-        name="hora"
-        min="16:00"
-        max="21:00"
-        required />
-        <h4>Materiales: </h4>
-        <input type="checkbox" name="materiales[]" id="mat_raqueta" value="raqueta">
-        <label for="mat_raqueta">Raqueta</label>
-        <input type="checkbox" name="materiales[]" id="mat_balon" value="balon">
-        <label for="mat_balon">Balón</label>
-        <input type="checkbox" name="materiales[]" id="mat_petos" value="petos">
-        <label for="mat_petos">Petos</label>
-    
-            
-        <h4>Términos y condiciones: </h4>
-        <input type="checkbox" name="terminos" required>
-        Acepto los términos y condiciones
+        <?php if (isset($errores['pista'])) { echo '<p><strong>' . e($errores['pista']) . '</strong></p>'; } ?>
+
+        <label for="fecha">Fecha</label>
+        <input type="date" name="fecha" id="fecha"
+               min="<?= date('Y-m-d') ?>" max="<?= date('Y-m-d', strtotime('+14 days')) ?>"
+               value="<?= e($reserva['fecha']) ?>">
+        <?php if (isset($errores['fecha'])) { echo '<p><strong>' . e($errores['fecha']) . '</strong></p>'; } ?>
+
+        <h4>Hora</h4>
+        <?php foreach ($horas as $hora) { ?>
+            <label>
+                <input type="radio" name="hora" value="<?= e($hora) ?>" <?php if ($reserva['hora'] == $hora) { echo 'checked'; } ?>>
+                <?= e($hora) ?>
+            </label>
+        <?php } ?>
+        <?php if (isset($errores['hora'])) { echo '<p><strong>' . e($errores['hora']) . '</strong></p>'; } ?>
+
+        <h4>Material (opcional)</h4>
+        <?php foreach ($materiales as $clave => $texto) { ?>
+            <label>
+                <input type="checkbox" name="material[]" value="<?= e($clave) ?>" <?php if (in_array($clave, $reserva['material'])) { echo 'checked'; } ?>>
+                <?= e($texto) ?>
+            </label>
+        <?php } ?>
+        <?php if (isset($errores['material'])) { echo '<p><strong>' . e($errores['material']) . '</strong></p>'; } ?>
+
+        <h4>Normas</h4>
+        <label>
+            <input type="checkbox" name="normas" value="1" <?php if ($reserva['normas'] == '1') { echo 'checked'; } ?>>
+            Acepto las normas
+        </label>
+        <?php if (isset($errores['normas'])) { echo '<p><strong>' . e($errores['normas']) . '</strong></p>'; } ?>
+
         <br><br>
-        <button type="submit">Enviar materiales</button>
+        <button type="submit">Reservar</button>
     </form>
 </body>
 </html>
