@@ -2,7 +2,7 @@
 
 function dump($var){
     echo '<pre>';
-    echo var_dump($var);
+    echo print_r($var);
     echo '</pre>';
 }
 
