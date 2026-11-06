@@ -34,3 +34,4 @@ function buscarPorId(PDO $pdo, $id){
     $stmt->execute([':id' => $id]);
     return $stmt->fetchAll();
 }
+

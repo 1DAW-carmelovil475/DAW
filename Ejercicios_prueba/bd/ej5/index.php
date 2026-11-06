@@ -16,8 +16,6 @@ if(isset($_GET['texto']) && !empty($_GET['texto'])){
 
 if(empty($libros)){
     exit('No se encuentra ningún libro con ese texto');
-}else{
-    dump($libros);
 }
 
 ?>
